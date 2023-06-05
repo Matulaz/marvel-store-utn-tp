@@ -1,0 +1,102 @@
+/* GENERAL */
+
+p, h3,h4,button{
+    font-family: 'Lato', sans-serif;
+}
+
+.section{
+    padding-top: 36px;
+}
+
+.section-title>h3{
+    font-weight: 900;
+    font-size: 48px;
+    letter-spacing: -2px;
+    margin:0px;
+}
+
+/*TOP SALES SECTION */
+.cards{
+    display:flex;
+}
+
+.card{
+    border: 1px black solid;
+    margin:10px;
+    height: 100%;
+    width: 200px;
+}
+
+.card .price{
+    font-size: 24px;
+    font-weight: 900;
+    letter-spacing: -2px;
+}
+
+.etiquetas{
+    display: flex;
+}
+
+.etiquetas>p{
+    background-color:black;
+    padding:2px 4px;
+    margin: 0px 4px 15px 0px;
+    color:white;
+    font-size:10px;
+}
+
+.imagen{
+    display:flex;
+    justify-content: center;
+}
+
+.imagen>img{
+    width: 150px;
+}
+
+.card .description{
+    font-size: 12px;
+}
+
+.btn-one{
+    width: 90%;
+    color:white;
+    background-color:red;
+    border:none;
+    padding: 4px 20px ;
+    font-size:11px;
+}
+
+.transparente{
+    opacity:0.25
+}
+
+
+/* CUSTOM SECTION */
+.custom-section{
+    display: flex;
+}
+
+.custom-section>div>img{
+    width: 33%;
+}
+
+.btn-two{
+    width: 150px;
+    color:white;
+    background-color:red;
+    border:none;
+    padding: 8px 10px ;
+    font-size:12px;
+}
+
+h4{
+    font-weight: 800;
+    font-size: 24px;
+    letter-spacing: -2px;
+    margin:0px;
+}
+
+
+
+
