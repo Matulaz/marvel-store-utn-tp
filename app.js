@@ -2,10 +2,22 @@ import express from 'express'
 import morgan from 'morgan'
 import mongoose from 'mongoose'
 import bodyParser from 'body-parser'
+import livereload from 'livereload'
+import connectLiveReload from 'connect-livereload'
+
+
+const liveReloadServer = livereload.createServer();
+liveReloadServer.server.once("connection", () => {
+  setTimeout(() => {
+    liveReloadServer.refresh("/");
+  }, 100);
+});
 
 
 
 const app= express()
+
+app.use(connectLiveReload());
 
 const producto={
     nombre:"Iron Man",

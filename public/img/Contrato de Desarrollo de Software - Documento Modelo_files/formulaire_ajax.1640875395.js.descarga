@@ -1,0 +1,464 @@
+// Fonction qui appelle le formulaire en ajax
+function soumission_ajax(id_document, numero_etape_de_provenance, nom_du_bouton)
+{
+	// On récupère les données qui viennent du formulaire
+	var donnees_du_formulaire = $("#formulaire_creation_document").serialize();
+	
+	var xhr = new XMLHttpRequest();
+
+	xhr.open('POST', 'creation_document_juridique.php');
+	xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+	
+	xhr.onreadystatechange = function() { // On gère ici une requête asynchrone
+
+		if (xhr.readyState == 4 && xhr.status == 200) { // Si le fichier est chargé sans erreur
+
+			// On ne fait rien si le formulaire a déjà changé d'étape alors qu'on a cliqué sur un bouton. Ça peut arriver si la réponse a mis trop de temps à arriver et si l'utilisateur a cliqué sur un autre bouton.
+			if (
+					( nom_du_bouton == "suivant" || nom_du_bouton == "etape_precedente" )
+					&&
+					numero_etape_de_provenance != $('#formulaire_creation_document').attr("data-etape")
+				)
+				return;
+		
+			// Avant de commencer, on supprime les fenêtres de dialogue et les messages éventuels
+			$('.veil').remove();
+			$('.popup-dialog').remove();
+			$('.message').remove();
+			
+			// On récupère la réponse qui vient du fichier creation_document_juridique.php
+			var response = xhr.responseText;
+			
+			// console.log(response);
+			// return;
+
+			// On traite le cas où il ne faut rien faire
+			if ( response == 'NeRienFaire' )
+			{
+				return;
+			}
+
+			// Si on a demandé un rechargement de page, on recharge la page
+			if ( response == 'rechargement' )
+			{
+				location.reload();
+				return;
+			}
+			
+			// Si on a demandé une redirection, on redirige vers l'URL demandée
+			if ( response.substring(0,11) == 'redirection' )
+			{
+				var message_split = response.split("///split_ajax///");
+				document.location.href = message_split[1];
+				return;
+			}
+			
+			// Si on a demandé un avertissement, on récupère le texte d'avertissement et on le met dans la page
+			if ( response.substring(0,13) == 'avertissement' )
+			{
+				var message_split = response.split("///split_ajax///");
+				var pop_up_avertissement = document.getElementById('create_document_warning');
+
+				if ( pop_up_avertissement != null)
+					pop_up_avertissement.innerHTML = message_split[1];
+				
+				// On envoie la pop-up de l'avertissement
+				launchPopup( 'create_document_warning','auto' );
+			
+				// On arrête le loader éventuellement en cours sur le bouton
+				var bouton = $('button[name=suivant]');
+				var nouveau_texte_du_bouton = bouton.html();
+				nouveau_texte_du_bouton = nouveau_texte_du_bouton.replace('&nbsp;<i class="fa fa-spinner fa-pulse"></i>', '');
+				bouton.html(nouveau_texte_du_bouton);
+			
+				return;
+			}
+			
+			// On définit une regex pour valider les entiers
+			var regex_entier = /[0-9]+/;
+			
+			// On récupère les données provenant du PHP en splitant la chaîne de charactères renvoyées
+			var message_split = response.split("///split_ajax///");
+			var numero_etape_en_cours = message_split[0];
+			var nouveau_formulaire = message_split[1];
+			var nouveau_texte = '<span class="stabilisation"></span>' + message_split[2];
+			var progression = message_split[3];
+			var url_de_base = message_split[4];
+			var titre_de_page = message_split[5];
+			var debug = message_split[6];
+			
+			if ( typeof debug !== 'undefined' && debug != '' )
+				console.log(debug);
+			
+			// On affiche le texte
+			var texte_a_afficher = document.getElementById('texte_a_afficher');
+			if ( texte_a_afficher != null) {
+				texte_a_afficher.innerHTML = nouveau_texte;
+			}
+			
+			// On affiche le texte en version mobile
+			var texte_a_afficher_mobile = document.getElementById('texte_a_afficher_mobile');
+			if ( texte_a_afficher_mobile != null)
+				texte_a_afficher_mobile.innerHTML = nouveau_texte;
+	
+			// On retient la progression précédente et on affiche la nouvelle progression
+			if ( regex_entier.test(progression) )
+			{
+				$("#information_progression").attr("data-progression-precedente", parseInt($(".information_progression").text()));
+				
+				var information_progression = document.getElementById('information_progression');
+				if ( information_progression != null)
+					information_progression.innerHTML = progression+'%';
+			}
+			
+			// On enregistre un historique seulement si on ne vient pas des boutons back et forward du navigateur
+			if (
+					numero_etape_en_cours != 'undefined' && nouveau_formulaire != 'undefined' && regex_entier.test(numero_etape_en_cours) &&
+					nom_du_bouton != 'none' && titre_de_page != 'undefined'
+				)
+				history.pushState([id_document, numero_etape_en_cours, 'none', progression], titre_de_page, url_de_base+"-"+numero_etape_en_cours);
+			
+
+			// On affiche le formulaire sur la page
+			var champs_formulaire = document.getElementById('champs_formulaire');
+			
+			var getTopTooltip = function (el) {
+				var tooltip = el.find('.question').first().find('.button.tooltip');
+				if (tooltip.length !== 0) {
+					return tooltip;
+				}
+
+				return null;
+			}
+
+			if ( champs_formulaire != null) {
+				// Vitesse des animations
+				var duration = 150;
+				
+				// On ajoute le nouveau formulaire
+				$newHTML = $('<div style="position: absolute; top: 0; left: 0; right: 0;">' + nouveau_formulaire + '</div>');
+				// On lui applique le bon padding en fonction de la résolution de l'écran
+				var paddingVertical = $(champs_formulaire).css('padding-top');
+				var paddingHorizontal = $(champs_formulaire).css('padding-left');
+				$newHTML.css('padding-top', paddingVertical);
+				$newHTML.css('padding-bottom', paddingVertical);
+				$newHTML.css('padding-left', paddingHorizontal);
+				$newHTML.css('padding-right', paddingHorizontal);
+				$newHTML.appendTo('#champs_formulaire');
+				// On calcule sa hauteur
+				call_javascript_functions();
+				var height = $newHTML.height();
+				// On masque son contenu et sa div #controle
+				$newHTML.find('.formulaire_content').css('opacity', 0);
+				$newHTML.find('#controle').css('opacity', 0);
+
+				// Si on a un tooltip sur l'étape courante et l'étape suivante on lui applique une animation différente pour éviter l'effet de "clignotement"
+				var currentTooltip = getTopTooltip($(champs_formulaire));
+				var nextTooltip = getTopTooltip($newHTML);
+
+				if (currentTooltip !== null && nextTooltip !== null) {
+					if (currentTooltip.html() === nextTooltip.html()) {
+						// On ajoute un tooltip temporaire qui se place au dessus de l'actuel
+						var tmpTooltip = currentTooltip.clone();
+						$(tmpTooltip).addClass('tmptooltip');
+						// On le place correctement pour régler les problèmes en responsive
+						$(tmpTooltip).css('opacity', 0);
+						$(champs_formulaire).append(tmpTooltip);
+						$(tmpTooltip).css('top', '+=' + paddingVertical);
+						$(tmpTooltip).css('right', '+=' + paddingHorizontal);
+						$(tmpTooltip).css('opacity', 1);
+					}
+				}
+
+				// On récupère les div #controle
+				var $currentControls = $(champs_formulaire).find('#controle').first();
+				var $nextControls = $newHTML.find('#controle');
+
+				// On récupère les boutons .suivante
+				var $currentNextBtn = $currentControls.find('button.suivante');
+				var $nextNextBtn = $newHTML.find('button.suivante');
+
+				// On arrête les spinner des boutons
+				$currentControls.find('button').each(function (index, el) {
+					var newText = $(el).html();
+					newText = newText.replace('&nbsp;<i class="fa fa-spinner fa-pulse"></i>', '<i class="fa fa-chevron-right"></i>');
+					newText = newText.replace('<i class="fa fa-spinner fa-pulse"></i>&nbsp;', '<i class="fa fa-chevron-left"></i>');
+					$(el).html(newText);
+				});
+
+				// On positionne la div #controle courante en bas du bloc en absolute
+				var blocHeight = $(champs_formulaire).height();
+				$currentControls.addClass('bottom');
+				$(champs_formulaire).height(blocHeight + 'px');
+
+				// Disparition de l'ancien formulaire / apparition du nouveau formulaire
+				$(champs_formulaire).find('.formulaire_content').first().animate({
+					opacity: 0
+				}, duration);
+				$newHTML.find('.formulaire_content').animate({
+					opacity: 1
+				}, duration);
+
+				// Création de variables pour gérer les cas spéciaux
+				var firstStep = $currentControls.find('button').length === 1 || $nextControls.find('button').length === 1;
+				var lastStep = $.trim($currentNextBtn.text()) != $.trim($nextNextBtn.text());
+
+				// Animation de la hauteur du bloc
+				$(champs_formulaire).animate({
+					'height': height + 'px'
+				}, duration, function () {
+					if (!firstStep && !lastStep) {
+						finishAnimation();
+					}
+				});
+
+				// Gestion des cas spéciaux
+				if (firstStep || lastStep) {
+					if (firstStep) {
+						// Passage de la 1ère à la 2ème étape
+						if ($currentControls.find('button').length === 1) {
+							// ---- Création des variables utiles ----
+							// On récupère la position du bouton .suivante et le bouton .retour_arriere next
+							var nextBtnPos = $newHTML.find('button.suivante').offset().left - $currentControls.offset().left - 10;
+							var $nextPrevBtn = $newHTML.find('button.retour_arriere');
+
+							// ---- Préparation de l'animation
+							// On passe l'opacité des textes situés sous les boutons à 0
+							$newHTML.find('.controle-text').css('opacity', 0);
+							$nextControls.css('opacity', 1);
+
+							// ---- Animation ----
+							// Apparition du bouton .retour_arriere next
+							$nextNextBtn.css('opacity', 0);
+							$nextPrevBtn.animate({
+								opacity: 1
+							}, duration, function () {
+								$nextNextBtn.css('opacity', 1);
+							});
+						}
+						// Passage de la 2ème à la 1ère étape
+						if ($nextControls.find('button').length === 1) {
+							// ---- Création des variables utiles ----
+							// On clone la div #controle next et récupère la position en left du bouton .suivante current
+							var $nextControlsCopy = $nextControls.clone();
+							var nextBtnPos = $currentNextBtn.offset().left - $currentControls.offset().left - 10;
+
+							// ---- Préparation de l'animation ----
+							// On ajoute la div clonée au current form
+							$(champs_formulaire).find('form').first().append($nextControlsCopy);
+							// On la place en absolute en bas du bloc
+							$nextControlsCopy.addClass('bottom');
+							// On passe son opacité à 1
+							$nextControlsCopy.css('opacity', 1);
+							// On la positionne en left en fonction de la position précédemment calculée
+							$nextControlsCopy.find('button').css('left', nextBtnPos);
+							// On passe l'opacité du bouton .suivante next à 0
+							$currentNextBtn.css('opacity', 0);
+
+							// ---- Animation ----
+							// Disparition des controles courants
+							$currentControls.animate({
+								opacity: 0
+							}, duration);
+							// Animation du bouton vers la gauche
+							$nextControlsCopy.find('button').animate({
+								left: 0
+							}, duration, function () {
+								finishAnimation();
+							});
+						}
+					}
+					if (lastStep) {
+						// ---- Création des variables utiles ----
+						// On récupère la largeur du bouton .suivante next
+						var nextNextBtnWidth = $nextNextBtn.outerWidth();
+						// On récupère le texte du bouton .suivante current
+						var $currentText = $currentNextBtn.find('.btn-text');
+						// On clone le texte du bouton .suivante next
+						var $newText = $nextNextBtn.find('.btn-text').clone();
+
+						// ---- Préparation de l'animation ----
+						// On passe son opacité à 0 et on le place en absolute
+						$newText.css('opacity', 0);
+						$newText.addClass('absolute');
+						// On l'ajoute au bouton .suivante current
+						$currentNextBtn.append($newText);
+						// Pour éviter le passage à la ligne du texte si le bouton n’est pas assez large
+						$currentNextBtn.css('white-space', 'nowrap');
+
+						// ---- Animation ----
+						// Apparition du nouveau texte / Disparation du current
+						$newText.animate({
+							opacity: 1
+						}, duration);
+						$currentText.animate({
+							opacity: 0
+						}, duration);
+					}
+
+					if (firstStep && $currentControls.find('button').length === 1 && lastStep) {
+						// Animation du bouton .suivante current vers la droite ET en largeur
+						$currentNextBtn.css('position', 'relative');
+						$currentNextBtn.animate({
+							'left': nextBtnPos + 'px',
+							'width': nextNextBtnWidth
+						}, duration, function () {
+							$currentNextBtn.css('white-space', 'normal');
+							finishAnimation();
+						});
+					}
+
+					else if (firstStep && $currentControls.find('button').length === 1) {
+						// Animation du bouton .suivante current vers la droite
+						$currentNextBtn.css('position', 'relative');
+						$currentNextBtn.animate({
+							'left': nextBtnPos + 'px'
+						}, duration, function () {
+							finishAnimation();
+						});
+					}
+
+					else if (lastStep) {
+						// Animation de la largeur du bouton .suivante current
+						$currentNextBtn.animate({
+							'width': nextNextBtnWidth
+						}, duration, function () {
+							$currentNextBtn.css('white-space', 'normal');
+							finishAnimation();
+						});
+					}
+				}
+
+				var finishAnimation = function () {
+					// On détruit les datepickers pour corriger un bug
+					destroy_datepickers();
+					// On remplace le html
+					champs_formulaire.innerHTML = $newHTML.html();
+					// On passe l'opacité de la div #controle à 1
+					$(champs_formulaire).find('.controle-text').css('opacity', 1);
+					$(champs_formulaire).find('#controle').css('opacity', 1);
+					// On supprime l'éventuel tooltip temporaire
+					$(tmpTooltip).remove();
+					// On envoie un indice visuel pour indiquer à l'utilisateur, s'il est connecté, que son document est enregistré dans son compte
+					if ( nom_du_bouton == "suivant" || nom_du_bouton == "etape_precedente" ) {
+						signaler_sauvegarde();
+					}
+					// On remet la hauteur de #champs_formulaire en auto
+					$(champs_formulaire).css('height', 'auto');
+
+					// Relance des fonctions Javascript
+					call_javascript_functions();
+				}
+			}
+		}
+		else if (xhr.readyState == 4 && xhr.status >= 400)  // S'il y a eu une erreur dans le chargement du fichier
+		{
+			// S'il y a eu une erreur dans le chargement du fichier, on soumet simplement le formulaire.
+			// On ne traite que le cas du bouton "suivant". A améliorer.
+			if( nom_du_bouton == "suivant" && numero_etape_de_provenance == $('#formulaire_creation_document').attr("data-etape") )
+			{
+				$('#formulaire_creation_document').submit();
+			}
+		}
+	};
+
+	// La requête est prête, on envoie tout !
+	xhr.send("id_document_ajax="+id_document+"&numero_etape_de_provenance="+numero_etape_de_provenance+"&nom_du_bouton="+nom_du_bouton+"&"+donnees_du_formulaire+"&timestamp_envoi_js="+Date.now());
+}
+
+function call_javascript_functions () {
+	faire_clignoter_le_texte_apparu_avec_ajax();
+	placement_dans_le_document_ajax();
+	
+	allumer_en_jaune();
+	acceder_au_clic();
+	afficher_bulle_aide_flou();
+	supprimer_bulle_aide_flou();
+	afficher_bulle_aide_lancement();
+	faire_defiler_texte_au_clic_sur_questions();
+	toutes_les_fonctions_du_formulaire();
+}
+
+function loadFile(name, value, id_document, numero_etape_en_cours, form_time)
+{
+	// return;
+	
+	// Afficher le loading
+	// ajaxBox_loader(true);
+  
+	var xhr = new XMLHttpRequest();
+
+	// On souhaite juste récupérer le contenu du fichier, la méthode GET suffit amplement :
+	xhr.open('POST', 'formulaire_generique_controleur.php');
+	xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+
+	xhr.onreadystatechange = function() { // On gère ici une requête asynchrone
+	
+		if (xhr.readyState == 4 && xhr.status == 200) { // Si le fichier est chargé sans erreur
+
+			var response = xhr.responseText;
+			
+			// Si la réponse est vide, on ne fait rien.
+			if ( response == false )
+				return;
+			
+			if ( response.substring(0,16) == 'Reinitialisation' )
+			{
+				var message_split = response.split("///");
+				document.location.href = message_split[1];
+				return;
+			}
+			
+			var texte = '<span class="stabilisation"></span>' + response;
+			
+			var texte_a_afficher = document.getElementById('texte_a_afficher');
+			if ( texte_a_afficher != null)
+				texte_a_afficher.innerHTML = texte;
+			
+			var texte_a_afficher_mobile = document.getElementById('texte_a_afficher_mobile');
+			if ( texte_a_afficher_mobile != null)
+				texte_a_afficher_mobile.innerHTML = texte;
+			
+			// Relance des fonctions Javascript
+			faire_clignoter_le_texte_apparu_avec_ajax();
+			placement_dans_le_document_ajax();
+			
+			allumer_en_jaune();
+			acceder_au_clic();
+			afficher_bulle_aide_flou();
+			supprimer_bulle_aide_flou();
+			afficher_bulle_aide_lancement();
+			
+			// Stopper le loading
+			// ajaxBox_loader(false);
+			
+		}
+	};
+	
+	xhr.send(name+'='+encodeURIComponent(value)+"&id_document_ajax="+id_document+"&numero_etape_en_cours="+numero_etape_en_cours+"&form_time="+form_time+"&verification_integrite_value="+value.length+"&timestamp_envoi_js="+Date.now());
+}
+
+// Fonction ajoutant ou supprimant le 'loader'
+function ajaxBox_loader(pState)
+{
+	return;
+	
+	// Ajout de l'image de loader
+	if (pState === true)
+	{
+		// Ajout d'un élement <img> d'id #ajaxBox_loader
+		var ajaxBox = document.getElementById('texte_a_afficher');
+		ajaxBox.innerHTML = ""; 
+		var img = ajaxBox.appendChild(document.createElement('img'));
+		img.id = 'ajaxBox_loader';
+		img.src = '../Style/Images/loader.gif';
+	}
+	// Suppression de l'image de loading
+	else
+	{
+		// Suppression de l'élement #ajaxBox_loader
+		var ajaxBox_loader = document.getElementById('ajaxBox_loader');
+		if (ajaxBox_loader)
+		ajaxBox_loader.parentNode.removeChild(ajaxBox_loader);
+	}
+}

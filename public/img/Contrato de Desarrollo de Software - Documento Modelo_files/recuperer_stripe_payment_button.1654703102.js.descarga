@@ -1,0 +1,87 @@
+if (typeof readCookie !== "function")
+{
+	function readCookie(name) {
+		var nameEQ = name + "=";
+		var ca = document.cookie.split(';');
+		for(var i=0;i < ca.length;i++) {
+			var c = ca[i];
+			while (c.charAt(0)==' ') c = c.substring(1,c.length);
+			if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
+		}
+		return null;
+	}
+}
+
+// Fonction qui vérifie la disponibilité des "paiements par bouton" de Stripe (Apple Pay et Google Pay)
+function recuperer_stripe_payment_button(region_iso, monnaie_iso, montant_a_passer_a_Stripe, callback=false)
+{
+	// On vérifie si le bouton est défini dans le cookie
+	var payment_button = readCookie('payment_button');
+
+	if ( payment_button !== null )
+	{
+		if (typeof callback === "function")
+			callback(payment_button);
+		return payment_button;
+	}
+
+	// On charge la librairie Stripe
+	$.getScript("https://js.stripe.com/v3/", function() {
+
+		try
+		{
+			var stripe = Stripe("pk_live_t24utIs9oR9Co3rK3HKcgSRQ", { apiVersion: "2019-03-14", });
+
+			// On prépare une fausse requête de paiement
+			var paymentRequest = stripe.paymentRequest({
+				country: region_iso,
+				currency: monnaie_iso,
+				total: {
+					label: 'Demo total',
+					amount: montant_a_passer_a_Stripe,
+				},
+			});
+			
+			
+			// On crée une requête de paiement
+			var elements = stripe.elements();
+			var prButton = elements.create('paymentRequestButton', {
+			  paymentRequest: paymentRequest,
+			});
+
+			// On vérifie la disponibilité du bouton
+			paymentRequest.canMakePayment().then(function(result) {
+				// Si le bouton est disponible, on le retient dans le cookie
+				if (result)
+				{
+					if ( typeof result.applePay !== "undefined" && result.applePay == true )
+						payment_button = 'apple';
+					else if ( typeof result.googlePay !== "undefined" && result.googlePay == true )
+						payment_button = 'google';
+					else
+						payment_button = 'none';
+					
+					document.cookie = 'payment_button='+payment_button+";path=/" + "; SameSite=LAX";
+					if (typeof callback === "function")
+						callback(payment_button);
+					return payment_button
+				}
+				else
+				{
+					payment_button = 'none';
+					document.cookie = 'payment_button='+payment_button+";path=/" + "; SameSite=LAX";
+					if (typeof callback === "function")
+						callback(payment_button);
+					return payment_button
+				}
+			});
+		} catch (error) {
+			console.log(error);
+			var payment_button = 'none';
+			document.cookie = 'payment_button='+payment_button+";path=/" + "; SameSite=LAX";
+			if (typeof callback === "function")
+				callback(payment_button);
+			return payment_button
+		}
+	});
+}

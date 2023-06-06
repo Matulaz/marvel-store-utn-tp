@@ -1,5 +1,9 @@
 /* GENERAL */
 
+body{
+    margin:30px;
+}
+
 p, h3,h4,button{
     font-family: 'Lato', sans-serif;
 }
@@ -9,40 +13,42 @@ p, h3,h4,button{
 }
 
 .section-title>h3{
-    font-weight: 900;
-    font-size: 48px;
-    letter-spacing: -2px;
+    font-weight: 1000;
+    font-size: 36px;
     margin:0px;
 }
 
 /*TOP SALES SECTION */
 .cards{
     display:flex;
+    justify-content: center;
 }
 
 .card{
-    border: 1px black solid;
-    margin:10px;
+    border: 1px rgb(240, 240, 240) solid;
+    margin:10px 0px 10px 0px;
     height: 100%;
-    width: 200px;
+    width: 100%;
+    padding:0px 20px 20px 20px
 }
 
 .card .price{
     font-size: 24px;
-    font-weight: 900;
-    letter-spacing: -2px;
+    font-weight: 800;
+    margin:12px 0px
 }
 
 .etiquetas{
     display: flex;
+    margin-left:-20px
 }
 
 .etiquetas>p{
     background-color:black;
-    padding:2px 4px;
+    padding:4px 6px;
     margin: 0px 4px 15px 0px;
-    color:white;
-    font-size:10px;
+    color:rgb(243, 243, 243);
+    font-size:8px;
 }
 
 .imagen{
@@ -51,20 +57,25 @@ p, h3,h4,button{
 }
 
 .imagen>img{
-    width: 150px;
+    width: 180px;
 }
 
 .card .description{
     font-size: 12px;
 }
 
+.btn-one-box{
+    display:flex;
+    justify-content: center;
+}
 .btn-one{
-    width: 90%;
+    width: 100%;
     color:white;
-    background-color:red;
+    background-color:#dd1229;
     border:none;
-    padding: 4px 20px ;
-    font-size:11px;
+    padding: 8px 20px ;
+    font-size:10px;
+    font-weight: 700;
 }
 
 .transparente{
@@ -73,30 +84,53 @@ p, h3,h4,button{
 
 
 /* CUSTOM SECTION */
+
 .custom-section{
     display: flex;
+    border: 1px rgb(240, 240, 240) solid;
+    margin-top:30px
 }
 
+
+
 .custom-section>div>img{
-    width: 33%;
+    width: 100%;
+}
+
+.custom-text{
+    margin-left:50px
 }
 
 .btn-two{
-    width: 150px;
+    width: 60%;
+    padding:-5px 10px -5px 10px;
     color:white;
-    background-color:red;
+    background-color:#dd1229;
     border:none;
-    padding: 8px 10px ;
     font-size:12px;
+    font-weight: 700;
+    margin-right: 20px;
 }
 
 h4{
     font-weight: 800;
     font-size: 24px;
-    letter-spacing: -2px;
     margin:0px;
 }
 
+.custom-text>p{
+    font-weight: 500;
+    font-size: 20px;
+}
+
+.btn-two-box{
+    display:flex;
+    justify-content: start;
+}
+
+.btn-two-box>p{
+    font-size: 12px;
+}
 
 
 

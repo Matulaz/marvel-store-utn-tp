@@ -1,0 +1,833 @@
+
+
+
+// ----------------------------------------------------------------------------------------------- //
+// ------------------------------ FONCTION REMPLACEMENT SELECT BOX ------------------------------- //
+// ----------------------------------------------------------------------------------------------- //
+function remplacement_select_box(id_de_la_select_box) {
+	var selecteur = "#" + id_de_la_select_box;
+	
+	// Initialisation de la variable de test si la fonction est déjà lancée
+	var verification_remplacement = 0;
+	// On boucle sur tous les selects de la page
+	$(selecteur).each(function(){
+		// On boucle sur toutes les options de ce select
+		$(this).children("option").each(function(){
+			// Si l'attribut accesskey de cette option est non nul
+			if($(this).attr("accesskey") != null){
+				// On distribue en tableau les ids en paramètre de cette option
+				var elem = $(this).attr("accesskey").split(',');
+				// Taille du tableau des ids
+				var taille_du_tableau = elem.length;
+				// On place dans une variable la valeur ('value') de l'option en cours de traitement
+				var valeur_du_radio_selectionne = $(this).attr("value");
+				// On teste la valeur de l'attribut id pour savoir s'il est
+				
+				// On parcours le tableau
+				for(i=0;i<taille_du_tableau; i++){ 
+					var a_construire = '#' + elem[i];
+					if ($(this).is(':selected')){
+						verification_remplacement = 1;
+						var all_of_input = "[id*=" + elem[i] + "]";
+						//$(all_of_input).each(function(){alert(a_construire);
+							// Désactivation du champ
+							$(all_of_input).addClass("variable_en_cours_de_remplissage");
+							$(all_of_input).text(valeur_du_radio_selectionne);	
+						//});
+					}else{
+						if(verification_remplacement == 0){
+							$(a_construire).each(function(){
+								// Réactivation du champ
+								$(a_construire).removeClass("variable_en_cours_de_remplissage");
+								$(this).text(' ___________ ');	
+							});
+						}
+					}
+				}
+					
+				
+			}
+			
+		});
+	});
+}
+// ----------------------------------------------------------------------------------------------- //
+// ------------------------------- FONCTION REMPLACEMENT RADIO BOX ------------------------------- //
+// ----------------------------------------------------------------------------------------------- //
+// function remplacement_radio_box2(id_du_bouton_radio) {console.log(id_du_bouton_radio);
+	// var selecteur = "#" + id_du_bouton_radio;
+	// $(selecteur).each(function(){
+		// var verification = 0;
+		// $(this).parent(".champ_radio_formulaire_principal").parent(".question").children(".champ_radio_formulaire_principal").each(function(){
+			// if($(this).children("input").attr("accesskey") != null){
+				// var elem = $(this).children("input").attr("accesskey").split(',');
+				// // Taille du tableau
+				// var taille_du_tableau = elem.length;
+				// var valeur_du_radio_selectionne = $(this).children("input").attr("value");
+				// // On parcours le tableau
+				// for(i=0;i<taille_du_tableau; i++){ 
+					// var a_construire = '#' + elem[i];
+					// if ($(this).children("input").is(':checked')){console.log("test2");
+						// verification = 1;
+						// $(a_construire).each(function(){
+							// // Désactivation du champ
+							// $(a_construire).addClass("variable_en_cours_de_remplissage");
+							// console.log(valeur_du_radio_selectionne);
+							// $(a_construire).text(valeur_du_radio_selectionne);	
+						// });
+					// }else{
+						// if(verification == 0){
+							// $(a_construire).each(function(){
+								// // Réactivation du champ
+								// $(a_construire).removeClass("variable_en_cours_de_remplissage");
+								// $(this).text(' ___________ ');	
+							// });
+						// }
+					// }
+				// }
+			// }
+			
+		// });
+	// });
+// }
+// ----------------------------------------------------------------------------------------------- //
+// ------------------------------- FONCTION REMPLACEMENT RADIO BOX ------------------------------- //
+// ----------------------------------------------------------------------------------------------- //
+function remplacement_radio_box(id_du_bouton_radio) {
+	var selecteur = "#" + id_du_bouton_radio;
+	$(selecteur).each(function(){
+		if($(this).attr("accesskey") != null){
+			var elem = $(this).attr("accesskey").split(',');
+			// Taille du tableau
+			var taille_du_tableau = elem.length;
+			var valeur_du_radio_selectionne = $(this).attr("value");
+			// On parcours le tableau
+			for(i=0;i<taille_du_tableau; i++){ 
+				var a_construire = '#' + elem[i];
+				$(a_construire).each(function(){
+					// Désactivation du champ
+					$(a_construire).addClass("variable_en_cours_de_remplissage");
+				//	console.log(valeur_du_radio_selectionne);
+					$(a_construire).text(valeur_du_radio_selectionne);	
+				});
+			}
+		}
+	});
+}
+// ----------------------------------------------------------------------------------------------- //
+// ---------------------------------- FONCTION REMPLIR VARIABLE ---------------------------------- //
+// ----------------------------------------------------------------------------------------------- //
+function remplir_variable(id_span_a_modifier, id_textbox) {
+    // --- récupération de la valeur du champs
+    var valeur1 = document.getElementById(id_textbox).value;
+
+
+				var constr_de_id = 'span#' + id_span_a_modifier;
+				
+			// --- on boucle sur chacun des identifiants pour remplacer la valeur
+			$(constr_de_id).each(function(){
+				if(valeur1 != ""){
+					$(this).html(valeur1);
+					$(this).addClass("variable_en_cours_de_remplissage");
+				} else {
+					$(this).html("________");    
+					$(this).removeClass("variable_en_cours_de_remplissage");
+				}
+			});
+    
+}
+// ----------------------------------------------------------------------------------------------- //
+// ------------------------------------- FONCTION READ COOKIE ------------------------------------ //
+// ----------------------------------------------------------------------------------------------- //
+function readCookie(name) {
+	var nameEQ = name + "=";
+	var ca = document.cookie.split(';');
+	for(var i=0;i < ca.length;i++) {
+		var c = ca[i];
+		while (c.charAt(0)==' ') c = c.substring(1,c.length);
+		if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
+	}
+	return null;
+}
+// ----------------------------------------------------------------------------------------------- //
+// ---------------------------------- FONCTION ALLUMER EN JAUNE ---------------------------------- //
+// ----------------------------------------------------------------------------------------------- //
+function allumer_en_jaune() {
+	$(".encours").hover(function(){
+		var recuperation_de_la_class_en_cours = $(this).attr("id");
+		var id_a_allumer =  recuperation_de_la_class_en_cours.split("span_id_");
+		var id_a_chercher = '#' + id_a_allumer[1];
+		
+		$(id_a_chercher).parent(".question").stop();
+		$(id_a_chercher).parent(".question").animate({"background-color": '#fdc90c'},200);
+		$(id_a_chercher).parent(".question").addClass('focus');
+
+		$("input[type='radio']").each(function(){
+			var attribut_en_cour = $(this).attr("accesskey");
+			if(attribut_en_cour == recuperation_de_la_class_en_cours) {
+				$(this).parent(".champ_radio_formulaire_principal").parent(".question").stop();
+				$(this).parent(".champ_radio_formulaire_principal").parent(".question").animate({"background-color": '#fcc831'},200);
+				$(this).parent(".champ_radio_formulaire_principal").parent(".question").addClass('focus');
+			}
+		});
+
+		if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+            $('#texte_a_afficher_container').slideUp();
+            $('.afficher_le_texte_btn').removeClass('open');
+        }
+	}, function(){
+		if ($(window).width() > 767) {
+			var recuperation_de_la_class_en_cours = $(this).attr("id");
+			var id_a_allumer =  recuperation_de_la_class_en_cours.split("span_id_");
+			var id_a_chercher = '#' + id_a_allumer[1];
+			$(id_a_chercher).parent(".question").stop();
+			$(id_a_chercher).parent(".question").animate({"background-color": '#ffffff'},200);
+			$(id_a_chercher).parent(".question").removeClass('focus');
+
+			$("input[type='radio']").each(function() {
+				var attribut_en_cour = $(this).attr("accesskey");
+				if(attribut_en_cour == recuperation_de_la_class_en_cours){
+					$(this).parent(".champ_radio_formulaire_principal").parent(".question").stop();
+					$(this).parent(".champ_radio_formulaire_principal").parent(".question").animate({"background-color": '#ffffff'},200);
+					$(this).parent(".champ_radio_formulaire_principal").parent(".question").removeClass('focus');
+				}
+			});
+		}
+	});
+
+	$('.question input, .question textarea').on('focusout', function () {
+		if ($(this).parent('.question').hasClass('focus')) {
+			$(this).parent('.question').stop();
+			$(this).parent('.question').animate({"background-color": '#ffffff'},200);
+			$(this).parent('.question').removeClass('focus');
+		}
+	});
+}
+// ----------------------------------------------------------------------------------------------- //
+// ---------------------------------- FONCTION ACCEDER AU CLIC  ---------------------------------- //
+// ----------------------------------------------------------------------------------------------- //	
+function acceder_au_clic() {
+	$(".encours").on("click",function(){
+		var recuperation_de_la_class_en_cours = $(this).attr("id");
+		var id_a_allumer =  recuperation_de_la_class_en_cours.split("span_id_");
+		var id_a_chercher = '#' + id_a_allumer[1];
+		$(id_a_chercher).focus();
+	});
+}
+
+// ----------------------------------------------------------------------------------------------- //
+// ---------------------------------- FONCTION AFFICHER BULLE AIDE FLOU -------------------------- //
+// ----------------------------------------------------------------------------------------------- //
+// Affichage des bulles d'infos sur le flou
+
+
+
+function afficher_bulle_aide_flou() {
+
+var t;
+
+$(".flou").hover(
+    function() {
+		
+		var empla = $(this).offset();
+		var top_variable = parseFloat(empla.top);
+		$(".bulle").stop();
+		$(".bulle").each(function(){$(this).remove();});
+		
+        t = setTimeout(function() {
+			
+          
+		   
+			var emplacement_du_bloc_encadre = $(".texte_inselectionnable").offset()
+
+			var modification_variable = top_variable - 90;
+			var emplacement_top = modification_variable.toString();
+			var ie_version = getInternetExplorerVersion();
+			if(ie_version == "8" || ie_version == "9"){
+				$("body").prepend('<div class="bulle" style="position:absolute;top:' + emplacement_top + 'px;left:' + emplacement_du_bloc_encadre.left + 'px;"> '+ $('#texte_explication_mots_grises').html() +'</div>');
+			}else{
+				$("body").prepend('<div class="bulle" style="position:absolute;top:' + emplacement_top + 'px;left:' + emplacement_du_bloc_encadre.left + 'px;"> '+ $('#texte_explication_mots_floutes').html() +'</div>');
+			}
+			
+			$(".bulle").animate({"background-color": '#fcc831', "opacity" : "1"}, 50);
+
+			if($(window).width() < 767) {
+				$(".bulle").delay(2000).animate({"opacity" : "0"}, 200, function() {
+					$(".bulle").each(function() {
+						$(this).remove();
+					});
+				});
+			}
+        }, 50);
+    },
+    function() {
+        clearTimeout(t);
+    }
+);
+}
+
+
+// ----------------------------------------------------------------------------------------------- //
+// ---------------------------------- FONCTION SUPPRIMER BULLE AIDE FLOU ------------------------- //
+// ----------------------------------------------------------------------------------------------- //
+// Suppression des bulles d'info sur le flou
+function supprimer_bulle_aide_flou() {
+$(".flou").on("mouseout",function(){
+	$(".bulle").animate({"opacity" : "0"}, 200, function() { $(".bulle").each(function(){$(this).remove();});
+		});
+	// $(".bulle").each(function(){$(this).remove();});
+});
+}
+
+// ----------------------------------------------------------------------------------------------- //
+// ------------------------------- FONCTION AFFICHER BULLE AIDE LANCEMENT ------------------------- //
+// ----------------------------------------------------------------------------------------------- //
+// Affichage des bulles d'infos sur le lancement
+function afficher_bulle_aide_lancement() {
+	$(".variable_vide").on("click",function(){
+		if($(this).parent("span").hasClass("encours")){
+
+		}else{
+			$(".bulle").each(function(){$(this).remove();});
+			var empla = $(this).offset();
+			var emplacement_du_bloc_encadre = $(".texte_inselectionnable").offset()
+			var top_variable = parseFloat(empla.top);
+			var modification_variable = top_variable - 90;
+			var emplacement_top = modification_variable.toString();
+			//console.log(empla.top + "px");
+			var ie_version = getInternetExplorerVersion();
+			$("body").prepend('<div class="bulle limite" style="position:absolute;top:' + emplacement_top + 'px;left:' + emplacement_du_bloc_encadre.left + 'px;"> '+ $('#texte_explication_remplissage').html() +'</div>');
+			$("#champs_formulaire").addClass("focus");
+			$("#champs_formulaire form").addClass("shake");
+			$(".bulle").animate({"background-color": '#fcc831', "opacity" : "1"}, 50);
+			$(".bulle").delay( 2000 ).fadeOut( 100, function() {
+				$("#champs_formulaire form").removeClass("shake");
+				$("#champs_formulaire").removeClass("focus");
+			});
+		}
+	});
+}
+// ----------------------------------------------------------------------------------------------- //
+// ---------------------------------- FONCTION BORNER LE NOMBRE ---------------------------------- //
+// ----------------------------------------------------------------------------------------------- //
+
+function borner_le_nombre(id_element, nombre_min, nombre_min_au_format_francais, nombre_max, nombre_max_au_format_francais)
+{
+	var element = document.getElementById(id_element);
+	var nombre=element.value;
+	
+	nombre = nombre.replace(/ /g, '');
+
+	if ( /[^0-9,-]/g.test(nombre) )
+		return;
+	
+	nombre = nombre.replace(/,/g, '.');
+	
+	nombre = parseFloat(nombre);	
+	
+	if (nombre_min !== '')
+	{
+		if ( nombre < nombre_min )
+		{
+			document.getElementById(id_element).value = nombre_min_au_format_francais;
+			return;
+		}
+	}
+	if (nombre_max !== '')
+	{
+		nombre_max_float = parseFloat(nombre_max);
+		if ( nombre > nombre_max_float )
+			document.getElementById(id_element).value = nombre_max_au_format_francais;
+	}
+}
+
+// Fonction pour signaler à l'utilisateur que le document a bien été enregistré dans son compte
+function signaler_sauvegarde()
+{
+	$('#texte_confirmation_sauvegarde').stop();
+	$('#texte_confirmation_sauvegarde').css('background-color', '#ffffff');
+	$('#texte_confirmation_sauvegarde').animate({'background-color': '#d1e7e4'}, 400);
+}
+
+// ----------------------------------------------------------------------------------------------- //
+// FONCTION pour faire défiler le texte lorsqu'on clique sur une question
+// Important : les questions doivent avoir des id numérotées de 1 à n
+// ----------------------------------------------------------------------------------------------- //
+function faire_defiler_texte_au_clic_sur_questions()
+{
+	$(".question").click(function(){
+		var id= $(this).attr("id");
+		var recup = '';
+		if($(this).children("textarea").length != 0){
+			recup = '#span_id_' + $(this).children("textarea").attr("id");
+		}else{
+			if($(this).children("input[type=text]").length != 0){
+				recup = '#span_id_' + $(this).children("input").attr("id");
+			}else{
+				if($(this).children("select").length != 0){
+					recup = '#span_id_' + $(this).children("select").attr("id");
+				}else{
+					recup = '#' + $(this).children(".champ_radio_formulaire_principal").children("input").attr("accesskey");
+				}
+			}
+		}
+		
+		placement_dans_le_document(recup, id);
+	});
+}
+
+// ----------------------------------------------------------------------------------------------- //
+// ----------------------------- FONCTION ....... ----------------------------- //
+// ----------------------------------------------------------------------------------------------- //
+
+var question_cliquee = "";
+var type_de_question = new Array();
+var i = 0;
+var presence_de_bloc_ajax = new Array();
+var presence_de_bloc_orange = new Array();
+var check_box = new Array();
+
+function definir_les_questions(){
+	var nombre_de_questions = $(".question").length;
+	var compteur = 0;
+	$(".question").each(function(){
+		compteur++;
+		if($(this).find("input").length > 0){
+			var type_en_cours = $(this).find("input").first().attr("type");
+			type_de_question[compteur] = type_en_cours;
+			if(type_en_cours == "checkbox"){
+				if($(this).find("input").prop('checked')){
+					check_box[compteur] = true;
+				}else{
+					check_box[compteur] = false;
+				}
+			}
+		}else{
+			if($(this).find("textarea").length > 0){
+				type_de_question[compteur] = "text";
+			}else{
+				type_de_question[compteur] = "select";
+			}
+		}
+	});
+}
+
+function afficher_le_tableau(){
+	for (var i = 1; i < type_de_question.length; i++) { 
+		console.log('----Question ' + i + ' ----');
+		console.log('Type = ' + type_de_question[i] + ' / ');
+		console.log('Presence_de_bloc_orange = ' + presence_de_bloc_orange[i] + ' / ');
+		console.log('Presence_de_bloc_ajax = ' + presence_de_bloc_ajax[i] + ' / ');
+		if(type_de_question[i] == "checkbox"){
+			console.log('Checkbox value = ' + check_box[i] + ' / ');
+		}
+	} 
+}
+
+function faire_clignoter_le_texte_apparu_avec_ajax(){
+	presence_de_bloc_ajax[question_cliquee] = false;
+	$(".texte_apparu_avec_ajax").animate({"background-color": '#aaaaaa'},100);
+	$(".texte_apparu_avec_ajax").css("display", "inline");
+	$(".texte_apparu_avec_ajax").animate({"background-color": '#ffffff'}, 2000);
+}
+
+function placement_dans_le_document_ajax(){	
+	if(presence_de_bloc_orange[question_cliquee] == false){
+		var emplacement = $(".texte_apparu_avec_ajax").first().offset();
+		var scroll_ref = $(".texte_inselectionnable").offset();
+		if(emplacement){
+			var container = $('.texte_inselectionnable');
+			container.stop(true).animate({
+			    scrollTop: emplacement.top - container.offset().top + container.scrollTop() - 35
+			},600, function() {
+			    // Animation complete.
+			});
+		}
+	}else{
+		
+	}
+}
+
+function placement_dans_le_document(recup, id){
+	var constr_id = '#' + id;
+	var numero_question = id.split("_");
+	question_cliquee = parseInt(numero_question[1]);
+	if(type_de_question[question_cliquee] == "checkbox"){
+		if(check_box[question_cliquee]){
+			if($(constr_id).find("input").prop('checked')){
+				check_box[question_cliquee] = true;
+			}else{
+				check_box[question_cliquee] = false;
+			}
+		}else{
+			if($(constr_id).find("input").prop('checked')){
+				check_box[question_cliquee] = true;
+			}else{
+				check_box[question_cliquee] = false;
+			}
+		}
+	}
+
+	presence_de_bloc_orange[question_cliquee] = false;
+	$(".texte_inselectionnable").scrollTop(readCookie("ppkcookie2"));
+	var scroll = $(recup).first().offset();
+	var scroll_ref = $(".texte_inselectionnable").offset();
+	if(scroll && scroll.top != 0){//alert("ok");
+		presence_de_bloc_orange[question_cliquee] = true;
+		var container = $('.texte_inselectionnable');
+		container.stop(true).animate({
+		    scrollTop: scroll.top - container.offset().top + container.scrollTop() - 35
+		},600, function() {
+		    // Animation complete.
+		    
+		});
+	}
+	placement_dans_le_document_ajax();
+}
+
+// Affichage des layers des aides
+function affichage_des_aides()
+{
+	$('body').on("click",function(event){
+		if($('body').children("#linebox").hasClass("yep")){
+
+			$( "#linebox" ).fadeOut( 100, function() {
+				$('body').children("#linebox").removeClass("yep");
+				
+				$('body').children("#linebox").remove();
+				$(".button").each(function(){
+					$(this).removeClass("active");
+				});
+			  });
+
+		}else{
+			$('body').children("#linebox").addClass("yep");	
+		}
+	});
+}
+
+// Affichage du texte sur mobile, lorsqu'on clique sur "Voir votre document en cours de création"
+function affichage_du_texte_sur_mobile()
+{
+	$(document).on('click', '.afficher_le_texte_btn', function() {
+		$('#texte_a_afficher_container').slideToggle();
+		if($(this).hasClass('open')){
+			$(this).removeClass('open');
+		} else{
+			$(this).addClass('open');
+		}
+	});
+}
+
+// Fonction qui soumet le formulaire lorsqu'on clique sur le bouton "étape suivante" d'un layer d'avertissement
+function soumettre_le_formulaire_en_provenance_d_un_avertissement()
+{
+	$("#formulaire_creation_document").append("<input name='on_vient_d_un_avertissement' type='hidden'/>");
+	$("#formulaire_creation_document").submit();
+}
+
+function afficher_boutons_radio() {
+	$(".question .champ_radio_formulaire_principal").each(function(){
+		
+		var texte = $(this).children("label").text();
+		if ($(this).find('.radio_box_texte').length === 0) {
+			$(this).append('<div class="radio_box_texte">' + texte + '</div>');
+			if($(this).children("input").is(':checked')){
+				$(this).children(".radio_box_texte").addClass("active");
+			}
+		}
+	});
+}
+
+function destroy_datepickers() {
+	if ( $( ".datepicker" ).length > 0 ) {
+		$( ".datepicker" ).datepicker('destroy');
+	}
+	
+	for (var iter = 0; iter <= 9; iter++) {
+		if ( $( ".datepicker"+iter ).length > 0 ) { 
+			$( ".datepicker"+iter ).datepicker('destroy');
+		}
+	}
+}
+
+// Fonction qui ajoute un optgroup vide à la fin des balises select sur iOS pour permettre l'affichage de longs texts
+function add_empty_optgroup_select() {
+	var ua = navigator.userAgent || navigator.vendor || window.opera;
+	if (/iPad|iPhone|iPod/.test(ua) && !window.MSStream) {
+		$('#formulaire_creation_document').find('select').append('<optgroup label=""></optgroup>');
+	}
+}
+
+// Fonction géante qui contient toutes les fonctions du formulaire. On en a besoin pour tout lancer d'un coup à chaque chargement du formulaire.
+function toutes_les_fonctions_du_formulaire()
+{
+	$('#texte_a_afficher').bind("cut copy paste",function(e) {
+        e.preventDefault();
+    });
+
+	definir_les_questions();
+
+	$(".section_de_formulaire.exemple_text").click(function(){
+		$("#explication_avocats").scrollTop();
+	});
+	
+	//Datepicker
+	for (var iter = 0; iter <= 9; iter++) {
+		if ( $( ".datepicker"+iter ).length > 0 ) {
+			$( ".datepicker"+iter ).datepicker({ 
+				changeMonth: true,
+				changeYear: true,
+				yearRange: p_yearRange,
+				altField: ".datepicker",
+				prevText: p_prevText,
+				nextText: p_nextText,
+				monthNamesShort: p_monthNamesShort,
+				dayNamesMin: p_dayNamesMin,
+				dateFormat: p_dateFormat,
+				firstDay: p_firstDay,
+				defaultDate: p_defaultDate,
+			});
+		}
+	}
+
+	// Select
+	add_empty_optgroup_select();
+
+	// Affichage adapté des documents
+	var hauteur_de_la_page = $(document).height();
+	var hauteur_de_la_fenetre = $(window).height();
+	//$(".premiere_fois_sur_un_formulaire").css("height",hauteur_de_la_fenetre);
+
+	//alert(hauteur_de_la_fenetre);
+	if(hauteur_de_la_fenetre < 800){
+		if($("body").hasClass("hauteur1")){
+			
+		}else{
+			$("body").addClass("hauteur1");
+		}
+	}
+	var hauteur_du_header = $("header").height();
+	var hauteur_du_breadcrumb = $("#breadcrumb").height();
+	var hauteur_des_actions = 0;
+	if($(".actions").height()){
+		hauteur_des_actions = $(".actions").height();
+	}
+	var hauteur_du_titre = $(".titre_de_page").height() + 40;
+	var description_du_document = $("#description_du_document").height() + 40;
+	var taille_du_bloc_contenu = hauteur_de_la_page - hauteur_du_header - hauteur_des_actions - hauteur_du_breadcrumb - 30;
+	var taille_du_bloc_daffichage = hauteur_de_la_page - description_du_document - hauteur_des_actions - hauteur_du_header - hauteur_du_breadcrumb - 35;
+	var taille_du_bloc_daffichage = hauteur_de_la_page - 195 - 40 - 35;
+	$(".frontoffice #contenu.remplir").css("height",taille_du_bloc_contenu + 'px');
+	//$(".texte_inselectionnable").css("height",taille_du_bloc_daffichage + 'px');
+	
+	function resizeDocumentForm() {
+		var windowHeight = $(window).height();
+		var headerHeight = $('#informations_generales_document_en_cours').outerHeight();
+		var docInfoHeight = $('#header').outerHeight();
+		var paddingAndSecurity = 55;
+		var totalSubstractHeight = headerHeight + docInfoHeight + paddingAndSecurity;
+		var docFormHeight = windowHeight - totalSubstractHeight;
+		
+		$(".texte_inselectionnable").css("height",docFormHeight);
+	}
+	resizeDocumentForm();
+	$(window).resize(function() {
+		resizeDocumentForm();
+	});
+
+
+	// Animation de la barre de progression
+	var information_progression = parseInt($(".information_progression").text());
+	var progression_precedente = $("#information_progression").attr("data-progression-precedente");
+	var duree_animation_progression = 200 + Math.abs(information_progression-progression_precedente)*(2000-200)/100;
+	
+	// Set new width percentage
+	$( "#progression_creation_document .bandeau .pourcentage" ).css({
+		'width': information_progression+"%",
+		'transition-duration': duree_animation_progression+"ms"
+	});
+		
+	if( information_progression > 0 && progression_precedente === undefined ){ 
+		$( "#progression_creation_document .bandeau .pourcentage" ).addClass('noanimate');
+	} else {
+		// Remove .noanimate (just in case)
+		$( "#progression_creation_document .bandeau .pourcentage" ).removeClass('noanimate');
+	}
+
+	if(information_progression == 100)
+		$("#progression_creation_document .bandeau .pourcentage").css("border-radius","3px");
+	
+	if (information_progression < 100)
+		$("#progression_creation_document .bandeau .pourcentage").css("border-radius","3px 0 0 3px");
+
+	//Création du cookie
+	$(".texte_inselectionnable").scroll(function(event){
+        // Valeur de défilement lors du chargement de la page
+        windowScroll = $(".texte_inselectionnable").scrollTop();
+		document.cookie = 'ppkcookie2=' + windowScroll + "; SameSite=LAX";
+    });
+	
+	//Récupération du cookie
+	if(readCookie("ppkcookie2") != null){
+		$(".texte_inselectionnable").scrollTop(readCookie("ppkcookie2"));
+	}
+
+	var compteur = 0;
+	$(".question").each(function(){
+		compteur++;
+		var varia = "question_" + compteur;
+		$(this).attr("id",varia);
+	});
+	
+	faire_defiler_texte_au_clic_sur_questions();
+	
+	$(".button").on("click",function(){
+		if (document.body){
+			var larg = (document.body.clientWidth);
+		}
+		$(".button").each(function(){
+			$(this).removeClass("active");
+		});
+		$(this).addClass("active");
+		var emplacement_hauteur_bouton = $(this).offset();
+		var mon_html = $(this).parent(".question").children(".explication").html();
+		$(".created").each(function(){
+			$(this).remove();
+		});
+		
+		var vitesse_apparition_aide = 200;
+		
+		if(larg > 767){
+			$("body").prepend("<div id='linebox' class='created' style='display:none; top:" + (emplacement_hauteur_bouton.top - 10) + "px; left:" + (emplacement_hauteur_bouton.left+64) + "px;'><div class='interieur'>" + mon_html + "</div></div>");
+			
+			$( "#linebox" ).fadeIn( vitesse_apparition_aide, function() {
+				// Animation complete
+			  });
+		}else{
+			$("body").prepend("<div id='linebox' class='created' style='display:none; top:0px; left:0px;'><div class='interieur'>" + mon_html + "</div></div>");
+			$( "#linebox" ).fadeIn( vitesse_apparition_aide, function() {
+				// Animation complete
+			  });
+		}
+		$(".close").on("click",function(){
+			$(this).parent("#linebox").remove();
+			$(this).parent(".explication").parent(".question").children("input").focus();
+			$(".button").each(function(){
+				$(this).removeClass("active");
+			});
+		});
+		
+	});
+	//
+	// LANCEMENT DE LA FONCTION ALLUMER EN JAUNE
+	allumer_en_jaune();
+	// LANCEMENT DE LA FONCTION ACCEDER AU CLIC
+	acceder_au_clic();
+	
+	// LANCEMENT DE LA FONCTION AFFICHER BOUTONS RADIO
+	afficher_boutons_radio()
+	
+	$(".radio_box_texte").click(function(){
+		$(this).parent(".champ_radio_formulaire_principal").parent(".question").children(".champ_radio_formulaire_principal").children(".radio_box_texte").each(function(){
+			$(this).removeClass("active");
+		});
+		$(this).addClass("active");
+		$(this).parent(".champ_radio_formulaire_principal").children("input").click();
+	});
+		
+	
+	// LANCEMENT DE LA FONCTION AFFICHER BULLE AIDE FLOU
+	afficher_bulle_aide_flou();
+	
+	// LANCEMENT DE LA FONCTION SUPPRIMER BULLE AIDE FLOU
+	supprimer_bulle_aide_flou();
+
+	// LANCEMENT DE LA FONCTION AFFICHER BULLE AIDE FLOU
+	afficher_bulle_aide_lancement();
+	
+		
+	// Affichage du layer des AIDES 
+	/*
+	$(".premiere_fois_sur_un_formulaire").click(function(){
+		$(this).css("display","none");
+		$(".frontoffice #formulaire_creation_document").children(".question").children(".allumage.question_no0").fadeIn( 400 ).delay( 2000 ).fadeOut( 400, function() {
+		});
+	});
+	*/
+	$(".frontoffice #formulaire_creation_document").children(".question").children(".afficher_bulle_besoin_d_aide_automatiquement").fadeIn( 400 ).delay( 2000 ).fadeOut( 400, function() {
+			// $(".allumage").each(function(){
+				// $(this).remove();
+			// });
+	});
+
+	$(".frontoffice .question").click(function(){
+		$(this).children(".afficher_bulle_besoin_d_aide_au_clic").fadeIn( 400 ).delay( 2000 ).fadeOut( 400, function() {
+			$(".allumage").each(function(){
+				$(this).remove();
+			});
+		});
+	});
+	
+	/*
+	$('.afficher_le_texte').click(function(){
+		// $('#texte_a_afficher_mobile').toggle('fast');
+		// if($(this).hasClass('open')){
+			// $('.fa.arrow').removeClass('fa-chevron-down');
+			// $('.fa.arrow').addClass('fa-chevron-up');
+			// $(this).removeClass('open');
+		// } else{
+			// $('.fa.arrow').removeClass('fa-chevron-up');
+			// $('.fa.arrow').addClass('fa-chevron-down');
+			// $(this).addClass('open');
+		// }
+		
+	});
+	*/
+	
+	$('.open-dialog').click(function() {
+		targetPopup = $(this).attr('data-popup');
+		if( $(this).hasClass('scroll-popup') ) {
+			launchPopup( targetPopup,'scroll' );	
+		} else {
+			launchPopup( targetPopup,'auto' );			
+		}
+
+	});
+	
+	// Désactivation de la touche "Entrée" sur les champs input du formulaire
+	$("#formulaire_creation_document input").keypress(function(e) {
+			var code = (e.keyCode ? e.keyCode : e.which);
+			if ( (code==13) || (code==10)){
+				jQuery(this).blur();
+				return false;
+			}
+
+		});
+		
+	// Ajout d'un loader sur le bouton. Le loader s'arrête automatiquement au bout d'un certain temps d'inactivité.
+	$("button").on('click',function(){
+		var bouton = $(this);
+		var nouveau_texte_du_bouton = bouton.html();
+		nouveau_texte_du_bouton = nouveau_texte_du_bouton.replace('<i class="fa fa-chevron-right"></i>', '&nbsp;<i class="fa fa-spinner fa-pulse"></i>');
+		nouveau_texte_du_bouton = nouveau_texte_du_bouton.replace('<i class="fa fa-chevron-left"></i>', '<i class="fa fa-spinner fa-pulse"></i>&nbsp;');
+		bouton.html(nouveau_texte_du_bouton);
+		
+		setTimeout(function(){
+				var nouveau_texte_du_bouton = bouton.html();
+				nouveau_texte_du_bouton = nouveau_texte_du_bouton.replace('&nbsp;<i class="fa fa-spinner fa-pulse"></i>', '<i class="fa fa-chevron-right"></i>');
+				nouveau_texte_du_bouton = nouveau_texte_du_bouton.replace('<i class="fa fa-spinner fa-pulse"></i>&nbsp;', '<i class="fa fa-chevron-left"></i>');
+				bouton.html(nouveau_texte_du_bouton);
+			}, 5000);
+    });
+}
+
+
+$(document).ready(function(){
+	toutes_les_fonctions_du_formulaire();
+	
+	affichage_des_aides();
+	
+	affichage_du_texte_sur_mobile();
+	
+});

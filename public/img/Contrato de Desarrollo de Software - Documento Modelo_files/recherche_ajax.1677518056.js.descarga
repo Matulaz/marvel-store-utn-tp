@@ -1,0 +1,33 @@
+// Fonction qui appelle la recherche en ajax
+function recherche_ajax(requete, root, id_div_recherche)
+{
+	var xhr = new XMLHttpRequest();
+
+	// On souhaite juste récupérer le contenu du fichier, la méthode GET suffit amplement :
+	xhr.open('POST', root+'recherche/recherche_traitement.php');
+	xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+	
+	xhr.onreadystatechange = function() { // On gère ici une requête asynchrone
+
+		if (xhr.readyState == 4 && xhr.status == 200) // Si le fichier est chargé sans erreur
+		{ 
+			var response = xhr.responseText;
+
+			document.getElementById(id_div_recherche).innerHTML = response;
+
+			if ( response == '' )
+				$('#' + id_div_recherche).slideUp(100);
+			else
+				$('#' + id_div_recherche).slideDown(100);
+			
+			return;
+		}
+		else if (xhr.readyState == 4 && xhr.status >= 400)  // S'il y a eu une erreur dans le chargement du fichier
+		{
+			return;
+		}
+	};
+	
+	// La requête est prête, on envoie tout !
+	xhr.send("recherche_ajax="+requete+'&timestamp_ajax='+Date.now());
+}
